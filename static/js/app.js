@@ -2,7 +2,7 @@ function init(){
     d3.json("samples.json").then(incomingData => {
 
         var otu_data = incomingData;
-        console.log(otu_data);
+            // console.log(otu_data);
 
         //Add ids to Test Subject ID No. dropdown menu
         var id_names = otu_data.names;
@@ -20,26 +20,33 @@ function init(){
 }
 init();
 
+function optionChanged(id){
+    charts(id);
+    demographicBox(id);
+};
 
 function charts(id) {
    d3.json("samples.json").then(incomingData => {
         var otu_data = incomingData;
             // console.log(otu_data);
-        var values = otu_data.samples[0].sample_values;
+        
+        var values = otu_data.samples.filter(value => value.id.toString() === id)[0].sample_values;
             // console.log(values);
-        var ids = otu_data.samples[0].otu_ids
+
+        var ids = otu_data.samples.filter(otu => otu.id.toString() === id)[0].otu_ids;
+            // console.log(ids);
 
         // Slice the top 10 OTU values, labels and ids
         var topOTU = (values.slice(0, 10)).reverse();
             // console.log(topOTU);
-        var hoverText = otu_data.samples[0].otu_labels.slice(0, 10);
+        var hoverText = otu_data.samples.filter(label => label.id.toString() === id)[0].otu_labels.slice(0, 10);
             // console.log(hoverText)
         var OTU_ids = (ids.slice(0,10))
                         .reverse()
                         .map(id => `OTU ${id}`);
             // console.log(OTU_ids);
         
-        //Creating the horizontal bar chart that displays each sample
+        //Creating the horizontal bar chart that displays the top 10 OTUs found each individual
         var trace1 = {
             type: "bar",
             orientation: 'h',
@@ -52,10 +59,10 @@ function charts(id) {
         var data = [trace1];
 
         var layout = {
-            title: `Top 10 OTUs found in`
+            title: `Top 10 OTUs found in ${id}`
         };
 
-        Plotly.newPlot("bar", data, layout);
+        Plotly.newPlot('bar', data, layout);
         
         //Creating the bubble chart that displays each sample
         var trace2 = {
@@ -76,7 +83,6 @@ function charts(id) {
    });
 
 };
-
 
 
 function demographicBox(id){
@@ -100,14 +106,6 @@ function demographicBox(id){
 
     });
 };
-
-function optionChanged(id){
-    charts(id);
-    demographicBox(id);
-
-};
-    
-         
 
 
 
